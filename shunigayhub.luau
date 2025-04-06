@@ -1,4 +1,63 @@
 spawn(function()
+    while wait() do
+        local function blockPrints()
+            print = function() end
+            warn = function() end
+            error = function() end
+            debug.traceback = function() end
+            debug.info = function() end
+        end
+        local function monitorMetatables()
+            local mt = getrawmetatable(game)
+            if mt and not mt.__metatable then
+                setreadonly(mt, false)
+                local oldIndex = mt.__index
+                local oldNewIndex = mt.__newindex
+                mt.__index = function(self, key)
+                    if key == "debug" or key == "getrawmetatable" then
+                    end
+                    return oldIndex(self, key)
+                end
+                mt.__newindex = function(self, key, value)
+                    if key == "debug" or key == "getrawmetatable" then
+                    end
+                    return oldNewIndex(self, key, value)
+                end
+                setreadonly(mt, true)
+            end
+        end
+        local function blockUnsafeFunctions()
+            local unsafeFunctions = { "getfenv", "setfenv", "loadstring", "debug.setupvalue", "debug.setfenv" }
+            for _, func in ipairs(unsafeFunctions) do
+                _G[func] = function() 
+                end
+            end
+        end
+        local function blockSensitiveFunctions()
+            collectgarbage = function() 
+            end
+            os.time = function() 
+            end
+            os.date = function() 
+            end
+        end
+        local function monitorEnvironment()
+            local sensitiveVars = { "_G", "getfenv", "setfenv", "debug", "loadstring", "setmetatable", "getrawmetatable" }
+            for _, var in ipairs(sensitiveVars) do
+                local success, result = pcall(function() return _G[var] end)
+                if success and result then
+                end
+            end
+        end
+        pcall(blockPrints)
+        pcall(monitorMetatables)
+        pcall(monitorEnvironment)
+        pcall(blockSensitiveFunctions)
+        pcall(blockUnsafeFunctions)
+    end
+end)
+
+spawn(function()
 	for v621, v622 in pairs(game:GetService("ReplicatedStorage").Effect.Container:GetChildren()) do
 		if ((v622.Name == "Death") or (v622.Name == "Spawn")) then
 			v622:Destroy();
@@ -6296,9 +6355,51 @@ Volcanic:AddButton({
 })
 Toggle = Volcanic:AddToggle("MyToggle", {Title = "Teleport Prehistoric Island", Default = false })
 Toggle:OnChanged(function(Value)
-    getgenv().TweenPrehistoric = Value
+    getgenv().TweenPre = Value
 end)
 
+local function handlePrehistoricIsland()
+    local LocalPlayer = Players.LocalPlayer
+    local remoteEvent = ReplicatedStorage.Modules.Net["RE/PlayRelicHitEffect"]
+    local function topos(targetCFrame)
+        local character = LocalPlayer.Character
+        if character and character:FindFirstChild("HumanoidRootPart") then
+            character.HumanoidRootPart.CFrame = targetCFrame
+        end
+    end
+    local island = Workspace.Map:FindFirstChild("PrehistoricIsland")
+    while not island do
+        island = Workspace.Map:FindFirstChild("PrehistoricIsland")
+        task.wait()
+    end
+    while task.wait() do
+        if not World3 then continue end
+        if getgenv().TweenPre then
+            pcall(function()
+                local character = LocalPlayer.Character
+                if not character or not character:FindFirstChild("HumanoidRootPart") then return end
+                local prehistoricIsland = Workspace.Map:FindFirstChild("PrehistoricIsland")
+                if not prehistoricIsland then return end
+                local core = prehistoricIsland:FindFirstChild("Core")
+                local relic = core and core:FindFirstChild("PrehistoricRelic")
+                local skull = relic and relic:FindFirstChild("Skull")      
+                if skull then
+                    topos(CFrame.new(skull.Position))
+                    if getgenv().TweenPre and remoteEvent then
+                        remoteEvent:FireServer()
+                    end
+                    if not getgenv().TweenPre then
+                        getgenv().TweenPre = false
+                    end
+                end
+            end)
+        end
+    end
+end
+Toggle = Volcanic:AddToggle("MyToggle", {Title = "Find Prehistoric Island", Default = false })
+Toggle:OnChanged(function(Value)
+    getgenv().AutoFindPrehistoric = Value
+end)
 local function manageBoatSystem()
     local SetSpeedBoat = 350
     local seatHistory = {}
@@ -6322,7 +6423,7 @@ local function manageBoatSystem()
             end
         end
 
-        if not getgenv().TweenPrehistoric then return end
+        if not getgenv().AutoFindPrehistoric then return end
 
         local myBoat = nil
         for _, boat in pairs(Workspace.Boats:GetChildren()) do
@@ -6380,9 +6481,8 @@ local function manageBoatSystem()
         local prehistoricIsland = Workspace.Map:FindFirstChild("PrehistoricIsland")
         if prehistoricIsland then
             VirtualInputManager:SendKeyEvent(false, "W", false, game)
-            getgenv().TweenPrehistoric = false
-            getgenv().TweenPrehistoric = false
-        elseif getgenv().TweenPrehistoric and World3 and seat and seat.Occupant == humanoid then
+            getgenv().AutoFindPrehistoric = false
+        elseif getgenv().AutoFindPrehistoric and World3 and seat and seat.Occupant == humanoid then
             if not Workspace._WorldOrigin.Locations:FindFirstChild("Prehistoric Island") then
                 if (seat.Position - character.HumanoidRootPart.Position).Magnitude <= 5 then
                     local targetPos = Vector3.new(-999999, 999, -999999)
@@ -6399,7 +6499,7 @@ local function manageBoatSystem()
                             task.wait(0.1)
                             if (seat.Position - character.HumanoidRootPart.Position).Magnitude > 100 or
                                Workspace._WorldOrigin.Locations:FindFirstChild("Prehistoric Island") or
-                               not getgenv().TweenPrehistoric then
+                               not getgenv().AutoFindPrehistoric then
                                 tween:Cancel()
                                 break
                             end

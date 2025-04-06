@@ -6385,8 +6385,7 @@ end
 
 local function autoSkill()
     local vim = game:GetService("VirtualInputManager")
-    local skill
-    if checkSkillDF() then
+    if checkSkillDF() and checkSkillMelee() then
         equipTool(NameWeapon(getgenv().SelectWeaponSea))
         vim:SendKeyEvent(true, skill, false, game)
         task.wait(0.5)
@@ -6427,7 +6426,7 @@ local function defendVolcano()
     local char = plr.Character
     if not char or not char:FindFirstChild("HumanoidRootPart") then return end
     AutoHaki()
-    EquipWeapon(_G.SelectWeapon)
+    EquipWeapon(getgenv().SelectWeapon)
     removeInteriorLava()
     local targetRock = findValidRock()
     if targetRock then
@@ -6450,7 +6449,7 @@ local function defendVolcano()
         else
             topos(targetPos)
             if distance <= 1 then
-                EquipWeapon(_G.SelectWeapon)
+                EquipWeapon(getgenv().SelectWeapon)
                 useSkill = autoSkill()
                 task.wait(0.5)
             end
@@ -6461,7 +6460,7 @@ end
 spawn(function()
     while task.wait() do
         pcall(function()
-            if _G.AutoDefendVolcano then
+            if getgenv().AutoDefendVolcano then
                 defendVolcano()
             end
         end)

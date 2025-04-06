@@ -6298,9 +6298,7 @@ Toggle = Volcanic:AddToggle("MyToggle", {Title = "Teleport Prehistoric Island", 
 Toggle:OnChanged(function(Value)
     getgenv().TweenPrehistoric = Value
 end)
-function MovementManager:StopPrehistoricTween()
-    getgenv().TweenPrehistoric = false
-end
+
 function MovementManager:StartPrehistoricTween()
     spawn(function()
         local island
@@ -6316,7 +6314,7 @@ function MovementManager:StartPrehistoricTween()
                                 prehistoricIslandCore.Core:FindFirstChild("PrehistoricRelic")
                     local skull = relic and relic:FindFirstChild("Skull")
                     
-                    if skull and self:IsAlive(LocalPlayer.Character) then
+                    if skull then
                         local success = topos(CFrame.new(skull.Position))
                         if success then
                             getgenv().TweenPrehistoric = false

@@ -6298,11 +6298,9 @@ Toggle = Volcanic:AddToggle("MyToggle", {Title = "Teleport Prehistoric Island", 
 Toggle:OnChanged(function(Value)
     getgenv().TweenPrehistoric = Value
 end)
-function MovementManager:IsAlive(character)
-    local humanoid = character and character:FindFirstChildOfClass("Humanoid")
-    return humanoid and humanoid.Health > 0
+function MovementManager:StopPrehistoricTween()
+    getgenv().TweenPrehistoric = false
 end
-
 function MovementManager:StartPrehistoricTween()
     spawn(function()
         local island
@@ -6337,6 +6335,14 @@ Toggle = Volcanic:AddToggle("Toggle", {
 Toggle:OnChanged(function(value)
     getgenv().AutoDefendVolcano = value
 end)
+local function equipTool(weaponName)
+    if weaponName then
+        game:GetService("Players").LocalPlayer.Character:FindFirstChildOfClass("Humanoid"):EquipTool(
+            game:GetService("Players").LocalPlayer.Backpack:FindFirstChild(weaponName)
+        )
+    end
+end
+
 local function checkSkillMelee()
     local weaponName = NameWeapon(getgenv().SelectSkill)
     local skillsGui = game:GetService("Players").LocalPlayer.PlayerGui.Main.Skills

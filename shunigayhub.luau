@@ -6299,27 +6299,112 @@ Toggle:OnChanged(function(Value)
     getgenv().TweenPrehistoric = Value
 end)
 
-function MovementManager:StartPrehistoricTween()
-    spawn(function()
-        local island
-        while not island do
-            island = Workspace.Map:FindFirstChild("PrehistoricIsland")
-            task.wait(0.1)
+local function manageBoatSystem()
+    local SetSpeedBoat = 350
+    local seatHistory = {}
+    local isTeleporting = false
+    local LocalPlayer = Players.LocalPlayer
+
+    local function topos(targetCFrame)
+        if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+            LocalPlayer.Character.HumanoidRootPart.CFrame = targetCFrame
         end
-        while task.wait(0.1) do
-            if getgenv().TweenPrehistoric and World3 then
-                local prehistoricIslandCore = Workspace.Map.PrehistoricIsland
-                if prehistoricIslandCore then
-                    local relic = prehistoricIslandCore:FindFirstChild("Core") and 
-                                prehistoricIslandCore.Core:FindFirstChild("PrehistoricRelic")
-                    local skull = relic and relic:FindFirstChild("Skull")
+    end
+
+    RunService.RenderStepped:Connect(function()
+        local character = LocalPlayer.Character
+        if not character or not character:FindFirstChild("Humanoid") then return end
+        local humanoid = character.Humanoid
+
+        for boatName, seat in pairs(seatHistory) do
+            if not seat or not seat.Parent or seat.Name ~= "VehicleSeat" or seat.Occupant then
+                seatHistory[boatName] = nil
+            end
+        end
+
+        if not getgenv().TweenPrehistoric then return end
+
+        local myBoat = nil
+        for _, boat in pairs(Workspace.Boats:GetChildren()) do
+            if boat.Name == "Guardian" and boat:FindFirstChild("Owner") and boat.Owner.Value == LocalPlayer then
+                myBoat = boat
+                break
+            end
+        end
+        
+        if not myBoat then
+            local buyPos = Vector3.new(-16933.3535, -0.591003418, 520.89801)
+            topos(CFrame.new(buyPos))
+            if (character.HumanoidRootPart.Position - buyPos).Magnitude <= 10 then
+                game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("BuyBoat", "Guardian")
+            end
+            return
+        end
+
+        local seat = myBoat:FindFirstChild("VehicleSeat")
+        if seat then
+            seatHistory[myBoat.Name] = seat
+            if not humanoid.Sit and not seat.Occupant and not isTeleporting then
+                isTeleporting = true
+                topos(seat.CFrame * CFrame.new(0, 1, 0))
+                isTeleporting = false
+            end
+        end
+        
+        if seat and seat.Occupant == humanoid then
+            seat.MaxSpeed = SetSpeedBoat
+            seat.CFrame = CFrame.new(seat.Position) * seat.CFrame.Rotation
+
+            for _, v in pairs(myBoat:GetDescendants()) do
+                if v:IsA("BasePart") then v.CanCollide = false end
+            end
+            for _, v in pairs(character:GetDescendants()) do
+                if v:IsA("BasePart") then v.CanCollide = false end
+            end
+            
+            VirtualInputManager:SendKeyEvent(true, "W", false, game)
+        end
+
+        local islandsToDelete = {
+            "ShipwreckIsland", "SandIsland", "TreeIsland",
+            "TinyIsland", "MysticIsland", "KitsuneIsland",
+            "FrozenDimension"
+        }
+        for _, islandName in ipairs(islandsToDelete) do
+            local island = Workspace.Map:FindFirstChild(islandName)
+            if island and island:IsA("Model") then
+                island:Destroy()
+            end
+        end
+
+        local prehistoricIsland = Workspace.Map:FindFirstChild("PrehistoricIsland")
+        if prehistoricIsland then
+            VirtualInputManager:SendKeyEvent(false, "W", false, game)
+            getgenv().TweenPrehistoric = false
+            getgenv().TweenPrehistoric = false
+        elseif getgenv().TweenPrehistoric and World3 and seat and seat.Occupant == humanoid then
+            if not Workspace._WorldOrigin.Locations:FindFirstChild("Prehistoric Island") then
+                if (seat.Position - character.HumanoidRootPart.Position).Magnitude <= 5 then
+                    local targetPos = Vector3.new(-999999, 999, -999999)
+                    local distance = (seat.Position - targetPos).Magnitude
+                    local tween = TweenService:Create(
+                        seat,
+                        TweenInfo.new(distance / 300, Enum.EasingStyle.Linear),
+                        {CFrame = CFrame.new(targetPos)}
+                    )
+                    tween:Play()
                     
-                    if skull then
-                        local success = topos(CFrame.new(skull.Position))
-                        if success then
-                            getgenv().TweenPrehistoric = false
+                    spawn(function()
+                        while tween.PlaybackState == Enum.PlaybackState.Playing do
+                            task.wait(0.1)
+                            if (seat.Position - character.HumanoidRootPart.Position).Magnitude > 100 or
+                               Workspace._WorldOrigin.Locations:FindFirstChild("Prehistoric Island") or
+                               not getgenv().TweenPrehistoric then
+                                tween:Cancel()
+                                break
+                            end
                         end
-                    end
+                    end)
                 end
             end
         end

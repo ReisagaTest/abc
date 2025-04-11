@@ -57,6 +57,21 @@ spawn(function()
     end
 end)
 
+repeat wait() until game:IsLoaded()
+
+if syn then
+	Request_Var = syn.request
+else
+    Request_Var = request 
+end
+
+print("Loading Function")
+
+local res = Request_Var({
+    Url = "https://httpbin.org/get",
+    Method = "GET"
+}).Body;
+
 function Current_Exploit(Exploit)
     local decode = game:GetService('HttpService'):JSONDecode(res)
     if decode.headers['User-Agent'] == Exploit then
@@ -1559,39 +1574,21 @@ local fastAttack = FastAttack.new()
 table.insert(Connections, RunService.Stepped:Connect(function()
     fastAttack:Attack()
 end))
-do -- Activities Function
-    function m1click(pos) 
-        if not mouse then return end
-        pos = pos or mouse
-        wait()
-        vim:SendMouseButtonEvent(pos.X or 10,pos.Y or 10,0,true,game,0)
-        vim:SendMouseButtonEvent(pos.X or 10,pos.Y or 10,0,false,game,0)
-        wait()
+local function CheckSeaBeast()
+    for _, v in pairs(SeaBeasts:GetChildren()) do
+        if v:IsA("Model") and v:FindFirstChild("HumanoidRootPart") then
+            return true
+        end
     end
-    function click()
-        game:GetService("VirtualUser"):ClickButton1(Vector2.new())
+    return false
+end
+local function CheckPlayerInRange(player, range)
+    local character = player.Character
+    if character and character:FindFirstChild("HumanoidRootPart") then
+        local distance = (character.HumanoidRootPart.Position - Player.Character.HumanoidRootPart.Position).Magnitude
+        return distance <= range
     end
-    function KeyDown(key)
-        vim:SendKeyEvent(true, key, false, game)
-    end
-    function KeyUp(key)
-        vim:SendKeyEvent(false, key, false, game)
-    end
-    function KeyPress(key,delay,func)
-        vim:SendKeyEvent(true, key, false, game)
-        if type(delay) == "number" then task.wait(delay) end
-        if func then func() end
-        vim:SendKeyEvent(false, key, false, game)
-    end
-    function moveMouse(pos)
-        vim:SendMouseMoveEvent(pos.X,pos.Y,game)
-    end
-    function pK(key)
-        vim:SendKeyEvent(true, key, false, game)
-    end
-    function rK(key)
-        vim:SendKeyEvent(false, key, false, game)
-    end
+    return false
 end
 print("--[[Loaded UI]]--")
 local Fluent = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua"))()

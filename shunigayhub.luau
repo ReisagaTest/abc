@@ -1574,6 +1574,40 @@ local fastAttack = FastAttack.new()
 table.insert(Connections, RunService.Stepped:Connect(function()
     fastAttack:Attack()
 end))
+do -- Activities Function
+    function m1click(pos) 
+        if not mouse then return end
+        pos = pos or mouse
+        wait()
+        vim:SendMouseButtonEvent(pos.X or 10,pos.Y or 10,0,true,game,0)
+        vim:SendMouseButtonEvent(pos.X or 10,pos.Y or 10,0,false,game,0)
+        wait()
+    end
+    function click()
+        game:GetService("VirtualUser"):ClickButton1(Vector2.new())
+    end
+    function KeyDown(key)
+        vim:SendKeyEvent(true, key, false, game)
+    end
+    function KeyUp(key)
+        vim:SendKeyEvent(false, key, false, game)
+    end
+    function KeyPress(key,delay,func)
+        vim:SendKeyEvent(true, key, false, game)
+        if type(delay) == "number" then task.wait(delay) end
+        if func then func() end
+        vim:SendKeyEvent(false, key, false, game)
+    end
+    function moveMouse(pos)
+        vim:SendMouseMoveEvent(pos.X,pos.Y,game)
+    end
+    function pK(key)
+        vim:SendKeyEvent(true, key, false, game)
+    end
+    function rK(key)
+        vim:SendKeyEvent(false, key, false, game)
+    end
+end
 print("--[[Loaded UI]]--")
 local Fluent = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua"))()
 Window = Fluent:CreateWindow({
@@ -6566,124 +6600,43 @@ Toggle:OnChanged(function(Value)
     getgenv().AutoFindPrehistoric = Value
 end)
 
-local relicHitRemote = ReplicatedStorage.Modules.Net["RE/PlayRelicHitEffect"]
-
-local module_ = {
-    GetDis = function(a, b)
-        b = b or (LP.Character and LP.Character.HumanoidRootPart.CFrame) or CFrame.new()
-        return (a.Position - b.Position).Magnitude
-    end
-}
-
-local f = {
-    prehistoricIsland = Workspace.Map:FindFirstChild("PrehistoricIsland"),
-
-    checkPrehistoricIsland = function()
-        return Workspace.Map:FindFirstChild("PrehistoricIsland") ~= nil
-    end,
-
-    findBoat = function(mode)
-        local boats = Workspace.Boats
-        for _, boat in ipairs(boats:GetChildren()) do
-            local seat = boat:FindFirstChild("VehicleSeat")
-            if seat then
-                if mode == "Own" and boat:FindFirstChild("Owner") and tostring(boat.Owner.Value) == LP.Name then
-                    return boat
-                elseif mode ~= "Own" and module_.GetDis(seat.CFrame) <= 10 then
-                    return boat
-                end
-            end
-        end
-        return nil
-    end,
-
-    setBoatHeight = function(seat, height)
-        if seat and seat:FindFirstChild("BodyPosition") then
-            local bodyPos = seat.BodyPosition
-            bodyPos.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
-            bodyPos.Position = Vector3.new(seat.Position.X, height, seat.Position.Z)
-        end
-    end,
-    
-    moveBoat = function(seat, targetCFrame, speed)
-        if not seat or not seat:FindFirstChild("BodyPosition") then return end
-        local bodyPos = seat.BodyPosition
-        local distance = module_.GetDis(targetCFrame, seat.CFrame)
-        local duration = distance / (speed or 100)
-        local startPos = seat.Position
-        local targetPos = targetCFrame.Position
-        local startTime = tick()
-        
-        while tick() - startTime < duration do
-            if not seat or not seat.Parent then break end
-            local t = (tick() - startTime) / duration
-            local newPos = startPos:Lerp(targetPos, t)
-            bodyPos.Position = Vector3.new(newPos.X, bodyPos.Position.Y, newPos.Z)
-            task.wait()
-        end
-        if seat and seat.Parent then
-            bodyPos.Position = Vector3.new(targetPos.X, bodyPos.Position.Y, targetPos.Z)
-        end
-    end,
-
-    findValidTarget = function()
-        if not f.prehistoricIsland then return nil end
-        local volcanoRocksFolder = f.prehistoricIsland.Core:FindFirstChild("VolcanoRocks")
-        if not volcanoRocksFolder then return nil end
-        
-        for _, rock in ipairs(volcanoRocksFolder:GetChildren()) do
-            if rock:IsA("Model") then
-                local volcanorock = rock:FindFirstChild("volcanorock")
-                if volcanorock and volcanorock:IsA("MeshPart") then
-                    local color = volcanorock.Color
-                    if color == Color3.fromRGB(185, 53, 56) or color == Color3.fromRGB(185, 53, 57) then
-                        return volcanorock
+spawn(function()
+    while task.wait() do
+        if getgenv().AutoFindPrehistoric and World3 then
+            pcall(function()
+                local char = game.Players.LocalPlayer.Character
+                local humanoid = char and char:FindFirstChild("Humanoid")
+                if humanoid and humanoid.Sit then
+                    if not game.Workspace._WorldOrigin.Locations:FindFirstChild("Prehistoric Island") then
+                        for _, v in pairs(game:GetService("Workspace").Boats:GetChildren()) do
+                            if v:FindFirstChild("VehicleSeat") and v.Owner.Value == game.Players.LocalPlayer then
+                                local seat = v.VehicleSeat
+                                if (seat.Position - game.Players.LocalPlayer.Character.HumanoidRootPart.Position).Magnitude <= 5 then
+                                    local tween = game:GetService("TweenService"):Create(
+                                        seat, TweenInfo.new((seat.Position - Vector3.new(-999999, 999, -999999)).Magnitude / 300, Enum.EasingStyle.Linear),
+                                        {CFrame = CFrame.new(-999999, 999, -999999)}
+                                    )
+                                    tween:Play()
+                                    spawn(function()
+                                        while tween and tween.PlaybackState == Enum.PlaybackState.Playing do
+                                            task.wait(0.1)
+                                            if (seat.Position - game.Players.LocalPlayer.Character.HumanoidRootPart.Position).Magnitude > 100 or game.Workspace._WorldOrigin.Locations:FindFirstChild("Prehistoric Island") or not _G.FindPre then
+                                                tween:Cancel()
+                                                break
+                                            end
+                                        end
+                                    end)
+                                    break
+                                end
+                            end
+                        end
                     end
                 end
-            end
-        end
-        return nil
-    end,
-
-    fireRelicHit = function(target)
-        if target then
-            relicHitRemote:FireServer(target)
-        end
-    end
-}
-
-task.spawn(function()
-    while task.wait(0.1) do
-        if getgenv().AutoFindPrehistoric then
-            if not f.checkPrehistoricIsland() then continue end
-            
-            local boat = f.findBoat("Own") or f.findBoat("Near")
-            local seat = boat and boat:FindFirstChild("VehicleSeat")
-            if not seat then continue end
-
-            local bodyPos = seat:FindFirstChild("BodyPosition")
-            if not bodyPos then
-                bodyPos = Instance.new("BodyPosition")
-                bodyPos.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
-                bodyPos.Parent = seat
-            end
-            
-            local target = f.findValidTarget()
-            if target then
-                local waterBase = Workspace.Map:FindFirstChild("WaterBase-Plane") and Workspace.Map["WaterBase-Plane"].CFrame.Y or 0
-                f.setBoatHeight(seat, waterBase + 50)
-                f.moveBoat(seat, CFrame.new(target.Position), 350)
-
-                if module_.GetDis(seat.CFrame, target.CFrame) <= 10 then
-                    f.fireRelicHit(target)
-                end
-            else
-                local waterBase = Workspace.Map:FindFirstChild("WaterBase-Plane") and Workspace.Map["WaterBase-Plane"].CFrame.Y or 0
-                f.setBoatHeight(seat, waterBase + 100)
-            end
+            end)
         end
     end
 end)
+
 Toggle = Volcanic:AddToggle("Toggle", {
     Title = "Auto Event Volcano Island Defense",
     Default = false
@@ -8511,6 +8464,19 @@ if currentTime - lastNotificationTime >= notificationCooldown then
     })
     lastNotificationTime = currentTime
 end
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

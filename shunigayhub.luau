@@ -57,21 +57,6 @@ spawn(function()
     end
 end)
 
-repeat wait() until game:IsLoaded()
-
-if syn then
-	Request_Var = syn.request
-else
-    Request_Var = request 
-end
-
-print("Loading Function")
-
-local res = Request_Var({
-    Url = "https://httpbin.org/get",
-    Method = "GET"
-}).Body;
-
 function Current_Exploit(Exploit)
     local decode = game:GetService('HttpService'):JSONDecode(res)
     if decode.headers['User-Agent'] == Exploit then
@@ -6896,7 +6881,7 @@ Toggle = Race:AddToggle("Toggle", {Title = "Auto Draco V4 (Aprils Fools)", Defau
 Toggle:OnChanged(function(Value)
     getgenv().AutoDraco = Value
 end)
-
+print("maythgngubilua")
 Race:AddParagraph({
     Title = "Race Normal",
     Content = string.rep("-", 21)

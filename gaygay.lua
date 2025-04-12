@@ -37,20 +37,6 @@ tickToDate = function(time)
     return unpack(date)
 end
 
-Players = game.Players
-repeat 
-    Client = Players.LocalPlayer
-    wait()
-until Client
-
-    repeat
-        wait()
-        if tick() - start > 10 then
-            game:GetService("TeleportService"):Teleport(game.PlaceId)
-            break
-        end
-    until not Client.PlayerGui:WaitForChild("Main"):WaitForChild("Loading").Visible
-
 spawn(function()
 	for v621, v622 in pairs(game:GetService("ReplicatedStorage").Effect.Container:GetChildren()) do
 		if ((v622.Name == "Death") or (v622.Name == "Spawn")) then
@@ -59,38 +45,27 @@ spawn(function()
 	end
 end);
 
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local Players = game:GetService("Players")
-local player = Players.LocalPlayer
-local playerGui = player:WaitForChild("PlayerGui")
-
-
-if getgenv().Team == "Marines" then
-    ReplicatedStorage.Remotes.CommF_:InvokeServer("SetTeam", "Marines")
-elseif getgenv().Team == "Pirates" then
-    ReplicatedStorage.Remotes.CommF_:InvokeServer("SetTeam", "Pirates")
-end
-
-repeat
-    task.wait(1)
-    local chooseTeam = playerGui:FindFirstChild("ChooseTeam", true)
-    local uiController = playerGui:FindFirstChild("UIController", true)
-
-    if chooseTeam and chooseTeam.Visible and uiController then
-        for _, v in pairs(getgc(true)) do
-            if type(v) == "function" and getfenv(v).script == uiController then
-                local constant = getconstants(v)
-                pcall(function()
-                    if (constant[1] == "Pirates" or constant[1] == "Marines") and #constant == 1 then
-                        if constant[1] == getgenv().Team then
-                            v(getgenv().Team)
-                        end
+if game:GetService("Players").LocalPlayer.PlayerGui.Main:FindFirstChild("ChooseTeam") then
+    repeat task.wait()
+        if game:GetService("Players").LocalPlayer.PlayerGui:WaitForChild("Main").ChooseTeam.Visible == true then
+            if getgenv().Team == "Marines" then
+                for i, v in pairs(getconnections(game:GetService("Players").LocalPlayer.PlayerGui.Main.ChooseTeam.Container["Marines"].Frame.TextButton.Activated)) do
+                    for a, b in pairs(getconnections(game:GetService("UserInputService").TouchTapInWorld)) do
+                        b:Fire() 
                     end
-                end)
+                    v.Function()
+                end 
+            else
+                for i, v in pairs(getconnections(game:GetService("Players").LocalPlayer.PlayerGui.Main.ChooseTeam.Container["Pirates"].Frame.TextButton.Activated)) do
+                    for a, b in pairs(getconnections(game:GetService("UserInputService").TouchTapInWorld)) do
+                        b:Fire() 
+                    end
+                    v.Function()
+                end 
             end
         end
-    end
-until player.Team
+    until game.Players.LocalPlayer.Team ~= nil and game:IsLoaded()
+end
 
 if not game:IsLoaded() then
     game.Loaded:Wait()

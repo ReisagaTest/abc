@@ -43,12 +43,6 @@ repeat
     wait()
 until Client
 
-do -- Init Script
-    local start = Client.PlayerGui:WaitForChild("Main"):WaitForChild("Loading") and tick()
-    local Version = Client.PlayerGui:WaitForChild("Main"):WaitForChild("Version"):WaitForChild("Script").Parent
-    repeat wait() until Version.Text:find("Version")
-    local Version = Version.Text:split("Version")[2]
-
     repeat
         wait()
         if tick() - start > 10 then
@@ -56,7 +50,7 @@ do -- Init Script
             break
         end
     until not Client.PlayerGui:WaitForChild("Main"):WaitForChild("Loading").Visible
-    
+
 spawn(function()
 	for v621, v622 in pairs(game:GetService("ReplicatedStorage").Effect.Container:GetChildren()) do
 		if ((v622.Name == "Death") or (v622.Name == "Spawn")) then

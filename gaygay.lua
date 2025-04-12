@@ -27,18 +27,36 @@ _env.getconstants = debug.getconstants
 _env.getupvalue = debug.getupvalue
 _env.getupvalues = debug.getupvalues
 _env.getgc = _env.getgc or debug.getregistry
+_env.getreg = _env.getreg or debug.getregistry
 
-FormatEnemyName = function(name)
-    local strings = name:split(" ")
-    for i = #strings,1,-1 do
-        if strings[i]:sub(1,1) == "[" then
-            table.remove(strings,i)
-            table.remove(strings,i)
-        end
+tickToDate = function(time)
+    local date =  os.date("%Y-%m-%d-%H-%M-%S",time or tick()):split("-")
+    for i,v in pairs(date) do
+        date[i] = tonumber(v)
     end
-    return table.concat(strings," ")
+    return unpack(date)
 end
 
+Players = game.Players
+repeat 
+    Client = Players.LocalPlayer
+    wait()
+until Client
+
+do -- Init Script
+    local start = Client.PlayerGui:WaitForChild("Main"):WaitForChild("Loading") and tick()
+    local Version = Client.PlayerGui:WaitForChild("Main"):WaitForChild("Version"):WaitForChild("Script").Parent
+    repeat wait() until Version.Text:find("Version")
+    local Version = Version.Text:split("Version")[2]
+
+    repeat
+        wait()
+        if tick() - start > 10 then
+            game:GetService("TeleportService"):Teleport(game.PlaceId)
+            break
+        end
+    until not Client.PlayerGui:WaitForChild("Main"):WaitForChild("Loading").Visible
+    
 spawn(function()
 	for v621, v622 in pairs(game:GetService("ReplicatedStorage").Effect.Container:GetChildren()) do
 		if ((v622.Name == "Death") or (v622.Name == "Spawn")) then
@@ -2877,66 +2895,64 @@ end)
 spawn(function()
     local canRun = true
     local debounceTime = 0.5
-    while wait(debounceTime) do
+    while task.wait(debounceTime) do
         if getgenv().AutoFarm and FarmMode == "Farm Level" then
-            if canRun then
-                canRun = false
-                spawn(function()
-                    local player = game:GetService("Players").LocalPlayer
-                    local questTitle = player.PlayerGui.Main.Quest.Container.QuestTitle.Title.Text
-                    local questVisible = player.PlayerGui.Main.Quest.Visible
-                    local humanoidRoot = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
+            canRun = false
+            spawn(function()
+                local player = game:GetService("Players").LocalPlayer
+                local questGui = player.PlayerGui.Main.Quest
+                local questTitle = questGui.Container.QuestTitle.Title.Text
+                local questVisible = questGui.Visible
+                local humanoidRoot = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
+
+                if humanoidRoot then
                     if not string.find(questTitle, NameMon) then
                         getgenv().StartMagnet = false
                         game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("AbandonQuest")
                     end
+
                     if not questVisible then
                         getgenv().StartMagnet = false
                         CheckQuest()
-                        if BypassTP then
-                            local distance = (humanoidRoot.Position - CFrameQuest.Position).Magnitude
-                            if distance > 1500 then
-                                BTP(CFrameQuest * CFrame.new(0, 20, 5))
-                            elseif distance < 1500 then
-                                topos(CFrameQuest)
-                            end
+                        local targetCFrame = CFrameQuest * CFrame.new(0, 20, 5)
+                        if BypassTP and (humanoidRoot.Position - CFrameQuest.Position).Magnitude > 1500 then
+                            BTP(targetCFrame)
                         else
-                            topos(CFrameQuest)
+                            topos(targetCFrame)
                         end
                         if (humanoidRoot.Position - CFrameQuest.Position).Magnitude <= 20 then
                             game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("StartQuest", NameQuest, LevelQuest)
                         end
                     elseif questVisible then
                         CheckQuest()
-                        local enemies = game:GetService("Workspace").Enemies:GetChildren()
-                        for _, v in pairs(enemies) do
-                            if v:FindFirstChild("HumanoidRootPart") and v:FindFirstChild("Humanoid") then
-                                if v.Humanoid.Health > 0 and v.Name == Mon then
-                                    if string.find(game:GetService("Players").LocalPlayer.PlayerGui.Main.Quest.Container.QuestTitle.Title.Text, NameMon) then
-                                        repeat
-                                            task.wait(0.1)
-                                            AutoHaki()
-                                            EquipWeapon(getgenv().SelectWeapon)
-                                            PosMon = v.HumanoidRootPart.CFrame
-                                            topos(v.HumanoidRootPart.CFrame * Pos)
-                                            v.HumanoidRootPart.CanCollide = false
-                                            v.Humanoid.WalkSpeed = 0
-                                            v.Head.CanCollide = false
-                                            getgenv().StartMagnet = true
-                                            sethiddenproperty(player, "SimulationRadius", math.huge)
-                                        until not getgenv().AutoFarm or v.Humanoid.Health <= 0 or not v.Parent or not game:GetService("Players").LocalPlayer.PlayerGui.Main.Quest.Visible
-                                    else
-                                        getgenv().StartMagnet = false
-                                        game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("AbandonQuest")
-                                    end
+                        for _, enemy in pairs(game:GetService("Workspace").Enemies:GetChildren()) do
+                            local enemyHumanoid = enemy:FindFirstChild("Humanoid")
+                            local enemyRoot = enemy:FindFirstChild("HumanoidRootPart")
+                            if enemyHumanoid and enemyRoot and enemyHumanoid.Health > 0 and enemy.Name == Mon then
+                                if string.find(questGui.Container.QuestTitle.Title.Text, NameMon) then
+                                    repeat
+                                        task.wait(0.1)
+                                        AutoHaki()
+                                        EquipWeapon(getgenv().SelectWeapon)
+                                        PosMon = enemyRoot.CFrame
+                                        topos(enemyRoot.CFrame * Pos)
+                                        enemyRoot.CanCollide = false
+                                        enemyHumanoid.WalkSpeed = 0
+                                        enemy.Head.CanCollide = false
+                                        getgenv().StartMagnet = true
+                                        sethiddenproperty(player, "SimulationRadius", math.huge)
+                                    until not getgenv().AutoFarm or enemyHumanoid.Health <= 0 or not enemy.Parent or not questGui.Visible
+                                else
+                                    getgenv().StartMagnet = false
+                                    game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("AbandonQuest")
                                 end
                             end
                         end
                     end
-                end)
-                task.wait(0.5)
-                canRun = true
-            end
+                end
+            end)
+            task.wait(0.5)
+            canRun = true
         end
     end
 end)
@@ -3713,7 +3729,6 @@ spawn(function()
                             until not getgenv().AutoGetMelee or (character.HumanoidRootPart.Position - CFrame.new(-10371.4717, 330.764496, -10131.4199).Position).Magnitude <= 10                            
                             task.wait(1)
                             game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("BuyElectricClaw")
-                        elseif getgenv().AutoFarm then
                             getgenv().AutoFarm = false
                             task.wait(1)
                             repeat task.wait(1)

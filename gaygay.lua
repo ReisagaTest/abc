@@ -29,14 +29,6 @@ _env.getupvalues = debug.getupvalues
 _env.getgc = _env.getgc or debug.getregistry
 _env.getreg = _env.getreg or debug.getregistry
 
-tickToDate = function(time)
-    local date =  os.date("%Y-%m-%d-%H-%M-%S",time or tick()):split("-")
-    for i,v in pairs(date) do
-        date[i] = tonumber(v)
-    end
-    return unpack(date)
-end
-
 spawn(function()
 	for v621, v622 in pairs(game:GetService("ReplicatedStorage").Effect.Container:GetChildren()) do
 		if ((v622.Name == "Death") or (v622.Name == "Spawn")) then

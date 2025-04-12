@@ -21,14 +21,6 @@ function Current_Exploit(Exploit)
     end
 end
 
-repeat
-    wait()
-    if tick() - start > 10 then
-        game:GetService("TeleportService"):Teleport(game.PlaceId)
-        break
-    end
-until not Client.PlayerGui:WaitForChild("Main"):WaitForChild("Loading").Visible
-
 local _env = getgenv()
 _env.getconstant = debug.getconstant
 _env.getconstants = debug.getconstants

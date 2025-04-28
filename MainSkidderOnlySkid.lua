@@ -3324,7 +3324,6 @@ spawn(function()
                     else
                         repeat
                             wait()
-							EquipWeapon("Gun")
                             AttackGucci()
                         until game:GetService("Workspace").Enemies:FindFirstChild("Tyrant of the Skies") or not _G.Settings.Main["Auto Fully Tyrant Of The Skies"]
                     end
@@ -9880,6 +9879,10 @@ PrehistoricStatusParagraph = Tabs.ServerTab:Paragraph({
 	Title = "Prehistoric Status",
 	Desc = "N/A"
 });
+EyesStatusParagraph = Tabs.ServerTab:Paragraph({
+	Title = "Eyes Status",
+	Desc = "N/A"
+});
 spawn(function()
 	while task.wait() do
 		pcall(function()
@@ -9967,3 +9970,21 @@ spawn(function()
 		end);
 	end;
 end);
+spawn(function()
+	while task.wait() do
+		pcall(function()
+			if workspace.Map.TikiOutpost.IslandModel.Eye4.Transparency == 0 then
+				EyesStatusParagraph:SetDesc("Eyes: 4/4");
+			elseif workspace.Map.TikiOutpost.IslandModel.Eye3.Transparency == 0  then
+				EyesStatusParagraph:SetDesc("Eyes: 3/4");
+			elseif workspace.Map.TikiOutpost.IslandModel.Eye2.Transparency == 0 then
+				EyesStatusParagraph:SetDesc("Eyes: 2/4");
+			elseif workspace.Map.TikiOutpost.IslandModel.Eye1.Transparency == 0 then
+				EyesStatusParagraph:SetDesc("Eyes: 1/4");
+			else
+				EyesStatusParagraph:SetDesc("Eyes: 0/4");
+			end; 
+		end);
+	end;
+end);
+

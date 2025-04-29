@@ -5,7 +5,7 @@ local Window = WindUI:CreateWindow({
 	Folder = "Skidder",
 	Size = UDim2.fromOffset(630, 320),
 	Transparent = true,
-	Theme = "Sky",
+	Theme = "Dark",
 	SideBarWidth = 210,
 	HasOutline = false,
 })

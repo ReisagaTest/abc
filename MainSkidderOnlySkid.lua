@@ -1,4 +1,4 @@
-local WindUI = loadstring(game:HttpGet("https://vercel-pc5n1dqun-reisagas-projects.vercel.app/bulonui.lua"))();
+local WindUI = loadstring(game:HttpGet("https://tree-hub.vercel.app/api/UI/WindUI"))();
 local Window = WindUI:CreateWindow({
 	Title = "Skidder Hub (Beta Generation Dev)",
 	Author = "Blox Fruits (Only Skid)",

@@ -1,11 +1,11 @@
-local WindUI = loadstring(game:HttpGet("https://tree-hub.vercel.app/api/UI/WindUI"))();
+local WindUI = loadstring(game:HttpGet("https://vercel-pc5n1dqun-reisagas-projects.vercel.app/bulonui.lua"))();
 local Window = WindUI:CreateWindow({
 	Title = "Skidder Hub (Beta Generation Dev)",
 	Author = "Blox Fruits (Only Skid)",
 	Folder = "Skidder",
 	Size = UDim2.fromOffset(630, 320),
 	Transparent = true,
-	Theme = "Dark",
+	Theme = "Sky",
 	SideBarWidth = 210,
 	HasOutline = false,
 })
@@ -43,7 +43,7 @@ local Tabs = {
 		Desc = ""
 	}),
 	StatsTab = Window:Tab({
-		Title = "",
+		Title = "Stats",
 		Icon = "",
 		Desc = ""
 	}),
@@ -2201,7 +2201,7 @@ MainSection = Tabs.MainTab:Section({
 	Title = "Main",
 	TextXAlignment = "Left"
 });
-GameTimeParagraph = Tabs.MainTab:Paragraph({
+GameTimeParagraph = Tabs.ServerTab:Paragraph({
 	Title = "Game Time",
 	Desc = "0",
 	Image = "timer",
@@ -2218,7 +2218,7 @@ spawn(function()
 		end);
 	end;
 end);
-FpsParagraph = Tabs.MainTab:Paragraph({
+FpsParagraph = Tabs.ServerTab:Paragraph({
 	Title = "Fps",
 	Desc = "0",
 	Image = "monitor",
@@ -2231,7 +2231,7 @@ spawn(function()
 		end);
 	end;
 end);
-PingParagraph = Tabs.MainTab:Paragraph({
+PingParagraph = Tabs.ServerTab:Paragraph({
 	Title = "Ping",
 	Desc = "0",
 	Image = "signal",
@@ -2244,7 +2244,7 @@ spawn(function()
 		end);
 	end;
 end);
-DiscordServerParagraph = Tabs.MainTab:Paragraph({
+DiscordServerParagraph = Tabs.MiscTab:Paragraph({
 	Title = "Discord Server",
 	Desc = "Join discord server to get update info and webhooks!",
 	TextXAlignment = "Left",
@@ -3302,22 +3302,23 @@ spawn(function()
     while wait(0.2) do
         if _G.Settings.Main["Auto Fully Tyrant Of The Skies"] then
             pcall(function()
-                if not game:GetService("Workspace").Enemies:FindFirstChild("Tyrant of the Skies") then
+                local tyrantExists = game:GetService("Workspace").Enemies:FindFirstChild("Tyrant of the Skies")
+                if not tyrantExists then
                     if not checkEagleEye() then
-                        for _, v in pairs(game:GetService("Workspace").Enemies:GetChildren()) do
-                            if v.Name == "Serpent Hunter" or v.Name == "Skull Slayer" or v.Name == "Isle Champion" or v.Name == "Sun-kissed Warrior" then
-                                if v.Humanoid and v.Humanoid.Health > 0 then
+                        for _, enemy in pairs(game:GetService("Workspace").Enemies:GetChildren()) do
+                            if enemy.Name == "Serpent Hunter" or enemy.Name == "Skull Slayer" or enemy.Name == "Isle Champion" or enemy.Name == "Sun-kissed Warrior" then
+                                if enemy.Humanoid and enemy.Humanoid.Health > 0 then
                                     repeat
                                         wait()
                                         EquipWeapon(_G.Settings.Main["Selected Weapon"])
-                                        TweenPlayer(v.HumanoidRootPart.CFrame * Pos)
+                                        TweenPlayer(enemy.HumanoidRootPart.CFrame * Pos)
                                         Attack()
                                         AutoHaki()
-                                        v.Humanoid.JumpPower = 0
-                                        v.Humanoid.WalkSpeed = 0
-                                        PosMon = v.HumanoidRootPart.CFrame
-                                        MonFarm = v.Name
-                                    until not v.Parent or v.Humanoid.Health <= 0 or checkEagleEye() or not _G.Settings.Main["Auto Fully Tyrant Of The Skies"]
+                                        enemy.Humanoid.JumpPower = 0
+                                        enemy.Humanoid.WalkSpeed = 0
+                                        PosMon = enemy.HumanoidRootPart.CFrame
+                                        MonFarm = enemy.Name
+                                    until not enemy.Parent or enemy.Humanoid.Health <= 0 or checkEagleEye() or not _G.Settings.Main["Auto Fully Tyrant Of The Skies"]
                                 end
                             end
                         end
@@ -3327,28 +3328,18 @@ spawn(function()
                             AttackGucci()
                         until game:GetService("Workspace").Enemies:FindFirstChild("Tyrant of the Skies") or not _G.Settings.Main["Auto Fully Tyrant Of The Skies"]
                     end
-                end
-            end)
-        end
-    end
-end)
-
-spawn(function()
-    while wait(0.2) do
-        if _G.Settings.Main["Auto Fully Tyrant Of The Skies"] then
-            pcall(function()
-                if game:GetService("Workspace").Enemies:FindFirstChild("Tyrant of the Skies") then
-                    for _, v in pairs(game:GetService("Workspace").Enemies:GetChildren()) do
-                        if v.Name == "Tyrant of the Skies" then
+                else
+                    for _, enemy in pairs(game:GetService("Workspace").Enemies:GetChildren()) do
+                        if enemy.Name == "Tyrant of the Skies" and enemy.Humanoid and enemy.Humanoid.Health > 0 then
                             repeat
                                 wait()
                                 EquipWeapon(_G.Settings.Main["Selected Weapon"])
-                                TweenPlayer(v.HumanoidRootPart.CFrame * Pos)
+                                TweenPlayer(enemy.HumanoidRootPart.CFrame * Pos)
                                 Attack()
                                 AutoHaki()
-                                v.Humanoid.JumpPower = 0
-                                v.Humanoid.WalkSpeed = 0
-                            until not v.Parent or not game:GetService("Workspace").Enemies:FindFirstChild("Tyrant of the Skies") or not _G.Settings.Main["Auto Fully Tyrant Of The Skies"]
+                                enemy.Humanoid.JumpPower = 0
+                                enemy.Humanoid.WalkSpeed = 0
+                            until not enemy.Parent or enemy.Humanoid.Health <= 0 or not _G.Settings.Main["Auto Fully Tyrant Of The Skies"]
                         end
                     end
                 end

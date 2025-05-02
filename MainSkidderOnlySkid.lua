@@ -1932,6 +1932,15 @@ spawn(function()
 		end);
 	end);
 end);
+local CollectionService = game:GetService("CollectionService")
+local TweenService = game:GetService("TweenService")
+local Players = game:GetService("Players")
+local Workspace = game:GetService("Workspace")
+local Player = Players.LocalPlayer
+local Enemies = Workspace.Enemies
+local Settings = { BringMobs = false, BringDistance = 100 }
+local Cached = { Bring = {} }
+local Connections = {}
 local env = (getgenv or getrenv or getfenv)();
 local rs = game:GetService("ReplicatedStorage");
 local players = game:GetService("Players");
@@ -1944,6 +1953,16 @@ local playerFolder = game:GetService("Players");
 local AttackModule = {};
 local RegisterAttack = net:WaitForChild("RE/RegisterAttack");
 local RegisterHit = net:WaitForChild("RE/RegisterHit");
+local BRING_TAG = _ENV._Bring_Tag or "b" .. mathtoday.random(80, 20000) .. "t"
+_ENV._Bring_Tag = BRING_TAG
+
+local Module = {}
+
+function Module:IsAlive(enemy)
+    local humanoid = enemy:FindFirstChild("Humanoid")
+    return humanoid and humanoid.Health > 0
+end
+
 function AttackModule:AttackEnemy(EnemyHead, Table)
 	if EnemyHead then
 		RegisterAttack:FireServer(0);
@@ -4415,24 +4434,86 @@ BringMobToggle = Tabs.SettingsTab:Toggle({
 	Title = "Bring Mob",
 	Value = true,
 	Callback = function(state)
-		_G.Settings.Setting["Bring Mob"] = state;
-		(getgenv()).SaveSetting();
-	end
-});
-spawn(function()
-	while task.wait() do
-		if _G.Settings.Setting["Bring Mob"] then
-			pcall(function()
-				for i, v in pairs(game.Workspace.Enemies:GetChildren()) do
-					if not string.find(v.Name, "Boss") and v.Name == MonFarm and (v.HumanoidRootPart.Position - game.Players.LocalPlayer.Character.HumanoidRootPart.Position).Magnitude <= BringMobDistance then
-						v.HumanoidRootPart.CFrame = PosMon;
-						v.HumanoidRootPart.Size = Vector3.new(1, 1, 1);
-					end;
-				end;
-			end);
-		end;
-	end;
-end);
+		Settings.BringMobs = state
+        if not state then
+            for _, enemy in ipairs(CollectionService:GetTagged(BRING_TAG)) do
+                enemy:RemoveTag(BRING_TAG)
+            end
+        end
+    end
+})
+--Bring
+function Module:BringEnemies(toEnemy, superBring)
+    if not self:IsAlive(toEnemy) or not toEnemy.PrimaryPart then return end
+
+    pcall(sethiddenproperty, Player, "SimulationRadius", math.huge)
+
+    local character = Player.Character or Player.CharacterAdded:Wait()
+    local position = character:GetPivot().Position
+    local name = toEnemy.Name
+    local target = toEnemy.PrimaryPart.CFrame
+    local bringPositionTag = superBring and "ALL_MOBS" or name
+
+    if not Cached.Bring[bringPositionTag] or (target.Position - Cached.Bring[bringPositionTag].Position).Magnitude > 25 then
+        Cached.Bring[bringPositionTag] = target
+    end
+
+    if Settings.BringMobs then
+        Module.IsSuperBring = superBring or false
+        local enemyList = superBring and Enemies:GetChildren() or CollectionService:GetTagged(name)
+
+        for _, enemy in ipairs(enemyList) do
+            if not superBring and enemy.Name ~= name then return end
+            if enemy.Parent ~= Enemies or enemy:HasTag(BRING_TAG) or not enemy:FindFirstChild("CharacterReady") then return end
+
+            local primaryPart = enemy.PrimaryPart
+            if self:IsAlive(enemy) and primaryPart and (position - primaryPart.Position).Magnitude < Settings.BringDistance then
+                enemy.Humanoid.WalkSpeed = 0
+                enemy.Humanoid.JumpPower = 0
+                enemy:AddTag(BRING_TAG)
+            end
+        end
+    else
+        if not Cached.Bring[toEnemy] then
+            Cached.Bring[toEnemy] = toEnemy.PrimaryPart.CFrame
+        end
+        toEnemy.PrimaryPart.CFrame = Cached.Bring[toEnemy]
+    end
+end
+
+local function Bring(enemy)
+    local rootPart = enemy:WaitForChild("HumanoidRootPart")
+    local humanoid = enemy:WaitForChild("Humanoid")
+    local enemyName = enemy.Name
+
+    while enemy and enemy.Parent == Enemies and enemy:HasTag(BRING_TAG) and humanoid and humanoid.Health > 0 and rootPart and rootPart.Parent == enemy do
+        local target = Cached.Bring[Module.IsSuperBring and "ALL_MOBS" or enemyName]
+        if not target or (target.Position - rootPart.Position).Magnitude > Settings.BringDistance then break end
+
+        local tweenInfo = TweenInfo.new((target.Position - rootPart.Position).Magnitude / 300, Enum.EasingStyle.Linear)
+        local tween = TweenService:Create(rootPart, tweenInfo, { CFrame = target })
+        tween:Play()
+        tween.Completed:Wait()
+        task.wait()
+    end
+
+    if enemy and enemy:HasTag(BRING_TAG) then
+        enemy:RemoveTag(BRING_TAG)
+    end
+end
+
+local function EnemyAdded(enemy)
+    if Module:IsAlive(enemy) and enemy:FindFirstChild("CharacterReady") then
+        Module:BringEnemies(enemy, Module.IsSuperBring)
+    end
+end
+
+for _, enemy in CollectionService:GetTagged("BasicMob") do
+    EnemyAdded(enemy)
+end
+
+table.insert(Connections, CollectionService:GetInstanceAddedSignal("BasicMob"):Connect(EnemyAdded))
+table.insert(Connections, CollectionService:GetInstanceAddedSignal(BRING_TAG):Connect(Bring))
 local BringList = {
 	"Low",
 	"Normal",

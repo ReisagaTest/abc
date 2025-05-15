@@ -1641,7 +1641,7 @@ Shop:AddButton({
 	     game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("BlackbeardReward","Reroll","2")
      end
 })
-Shop:Add({
+Shop:AddButton({
     Title = "Buy Ghoul Race",
     Callback = function()
         local args1 = {[1] = "Ectoplasm", [2] = "BuyCheck", [3] = 4}

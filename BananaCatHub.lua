@@ -1189,6 +1189,7 @@ spawn(function()
         end)
     end)
 end)
+
 function DieWait()
 	if game.Players.LocalPlayer.Character:WaitForChild("Humanoid").Health == 0 or not game:GetService("Players").LocalPlayer.Character:FindFirstChild("Head") then if tween then tween:Cancel() end repeat wait() until game.Players.LocalPlayer.Character:WaitForChild("Humanoid").Health > 0; wait(1) if not game.Players.LocalPlayer.Character:FindFirstChild("HasBuso") then Com("F_","Buso") end end;
 end
@@ -1201,17 +1202,6 @@ IsSameName = function(full,sub)
 	return full:lower():find(sub:lower()) or sub:lower():find(full:lower()) or full == sub 
 end 
 
-dist = LPH_NO_VIRTUALIZE(function(a,b,noHeight)
-	DieWait()
-	local ff ,f2 = pcall(function()
-		if not b then
-			repeat wait() pcall(function () b = game:GetService("Players").LocalPlayer.Character.HumanoidRootPart.Position end) until b
-		end
-		return (Vector3.new(a.X,not noHeight and a.Y or 0,a.Z) - Vector3.new(b.X,not noHeight and b.Y or 0,b.Z)).magnitude
-	end)
-	if not ff then print(f2) return 0 end 
-	return f2
-end)
 spawn(function()
     local lastCall = 0
     local callInterval = 1

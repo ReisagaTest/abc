@@ -1190,18 +1190,6 @@ spawn(function()
     end)
 end)
 
-function DieWait()
-	if game.Players.LocalPlayer.Character:WaitForChild("Humanoid").Health == 0 or not game:GetService("Players").LocalPlayer.Character:FindFirstChild("Head") then if tween then tween:Cancel() end repeat wait() until game.Players.LocalPlayer.Character:WaitForChild("Humanoid").Health > 0; wait(1) if not game.Players.LocalPlayer.Character:FindFirstChild("HasBuso") then Com("F_","Buso") end end;
-end
-
-function havemob(name)
-	return game.Workspace.Enemies:FindFirstChild(name) or game.ReplicatedStorage:FindFirstChild(name)
-end
-
-IsSameName = function(full,sub)
-	return full:lower():find(sub:lower()) or sub:lower():find(full:lower()) or full == sub 
-end 
-
 spawn(function()
     local lastCall = 0
     local callInterval = 1
@@ -6247,6 +6235,11 @@ Toggle = Sea:AddToggle("Toggle", {Title = "Auto Attack Leviathan", Default = fal
 Toggle:OnChanged(function(state)
     getgenv().KillLevi = state
 end)
+
+IsSameName = function(full,sub)
+	return full:lower():find(sub:lower()) or sub:lower():find(full:lower()) or full == sub 
+end 
+
 local function AutoKillLeviathan()
     task.spawn(function()
         while getgenv().KillLevi do

@@ -1419,21 +1419,17 @@ RunService.RenderStepped:Connect(function()
         autoDodge()
     end
 end)
-local Library = loadstring(game:HttpGetAsync("https://github.com/ActualMasterOogway/Fluent-Renewed/releases/latest/download/Fluent.luau"))()
-local SaveManager = loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/ActualMasterOogway/Fluent-Renewed/master/Addons/SaveManager.luau"))()
-local InterfaceManager = loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/ActualMasterOogway/Fluent-Renewed/master/Addons/InterfaceManager.luau"))()
- 
-local Window = Library:CreateWindow{
-    Title = "Shinichii Hub",
-    SubTitle = "Blox Fruits",
-    TabWidth = 150,
-    Size = UDim2.fromOffset(760, 425),
-    Resize = true, 
-    MinSize = Vector2.new(500, 350),
-    Acrylic = true, -- The blur may be detectable, setting this to false disables blur entirely
-    Theme = "VSC Dark High Contrast",
-    MinimizeKey = Enum.KeyCode.LeftControl -- Used when theres no MinimizeKeybind
-}
+
+local Fluent = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua"))()
+Window = Fluent:CreateWindow({
+    Title = "Banana Cat Hub [ Freemium ]",
+    SubTitle = "| By Shinichi",
+    TabWidth = 155,
+    Size = UDim2.fromOffset(500, 350),
+    Acrylic = false, 
+    Theme = "Dark",
+    MinimizeKey = Enum.KeyCode.LeftControl 
+})
 Info = Window:AddTab({ Title = "Tab Info", Icon = "" })
 Info:AddButton({
     Title = "Discord",

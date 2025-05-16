@@ -1,3 +1,79 @@
+local SettingsGameData = {
+	TeleportIsland = getgenv().TeleportIsland or false,
+	AutoFarm = getgenv().AutoFarm or false,
+	AutoMaterial = getgenv().AutoMaterial or false,
+	MasteryFarm = getgenv().MasteryFarm or false,
+	AutoGetMelee = getgenv().AutoGetMelee or false,
+	TeleportToFruit = getgenv().TeleportToFruit or false,
+	AutoNewWorld = getgenv().AutoNewWorld or false,
+	AutoThirdSea = getgenv().AutoThirdSea or false,
+	AutoFactory = getgenv().AutoFactory or false,
+	AutoPirateRaid = getgenv().AutoPirateRaid or false,
+	AutoEliteHunter = getgenv().AutoEliteHunter or false,
+	AutoTouchPadHaki = getgenv().AutoTouchPadHaki or false,
+	AutoRipIndra = getgenv().AutoRipIndra or false,
+	AutoSoulReaper = getgenv().AutoSoulReaper or false,
+	AutoDoughKing = getgenv().AutoDoughKing or false,
+	AutoDarkbeard = getgenv().AutoDarkbeard or false,
+	DojoClaimQuest = getgenv().DojoClaimQuest or false,
+	DragonTalonUpgrade = getgenv().DragonTalonUpgrade or false,
+	BlazeEmberFarm = getgenv().BlazeEmberFarm or false,
+	AutoObservationHakiV2 = getgenv().AutoObservationHakiV2 or false,
+	AutoObservation = getgenv().AutoObservation or false,
+	AutoFarmBoss = getgenv().AutoFarmBoss or false,
+	AutoFarmAllBoss = getgenv().AutoFarmAllBoss or false,
+	Auto_Dungeon = getgenv().Auto_Dungeon or false,
+	SailBoat = getgenv().SailBoat or false,
+	RelzFishBoat = getgenv().RelzFishBoat or false,
+	RelzPirateBrigade = getgenv().RelzPirateBrigade or false,
+	RelzPirateGrandBrigade = getgenv().RelzPirateGrandBrigade or false,
+	AutoTerrorshark = getgenv().AutoTerrorshark or false,
+	AutoSeaBest = getgenv().AutoSeaBest or false,
+	AutoFrozenDimension = getgenv().AutoFrozenDimension or false,
+	KillLevi = getgenv().KillLevi or false,
+	UpgradeRaceV2 = getgenv().UpgradeRaceV2 or false,
+	AutoCyborg = getgenv().AutoCyborg or false,
+	AutoGhoul = getgenv().AutoGhoul or false,
+	QuestTrain_2 = getgenv().QuestTrain_2 or false,
+	TeleportMigare = getgenv().TeleportMigare or false,
+	Tweentohighestpoint = getgenv().Tweentohighestpoint or false,
+	TeleportToGear = getgenv().TeleportToGear or false,
+	AutoTrialRace = getgenv().AutoTrialRace or false,
+	AutoKillPlayerAfterTrial = getgenv().AutoKillPlayerAfterTrial or false,
+	AutoRainbowHaki = getgenv().AutoRainbowHaki or false,
+	AutoSkullGuitar = getgenv().AutoSkullGuitar or false,
+	AutoGetCDK = getgenv().AutoGetCDK or false,
+	AutoTushita = getgenv().AutoTushita or false,
+	AutoSaber = getgenv().AutoSaber or false,
+	TeleportPlayer = getgenv().TeleportPlayer or false
+}
+
+xpcall(function()
+	if not isfolder("Shinichi Hub/GameData/"..game.GameId) then
+		if syn then
+			makefolder("Shinichi Hub/GameData/"..game.GameId)
+			writefile("Shinichi Hub/GameData/"..game.GameId.."/"..game.Players.LocalPlayer.Name..".lua", game:GetService("HttpService"):JSONEncode(SettingsGameData))
+		else
+			makefolder("Shinichi Hub")
+			makefolder("Shinichi Hub/GameData")
+			makefolder("Shinichi Hub/GameData/"..game.GameId)
+			writefile("Shinichi Hub/GameData/"..game.GameId.."/"..game.Players.LocalPlayer.Name..".lua", game:GetService("HttpService"):JSONEncode(SettingsGameData))
+		end
+	end
+	SettingsGameData = game:GetService("HttpService"):JSONDecode(readfile("Shinichi Hub/GameData/"..game.GameId.."/"..game.Players.LocalPlayer.Name..".lua"))
+end, function() end)
+
+local Save = function()
+	if syn then
+		makefolder("Shinichi Hub/GameData/"..game.GameId)
+	else
+		makefolder("Shinichi Hub")
+		makefolder("Shinichi Hub/GameData")
+		makefolder("Shinichi Hub/GameData/"..game.GameId)
+	end
+	writefile("Shinichi Hub/GameData/"..game.GameId.."/"..game.Players.LocalPlayer.Name..".lua", game:GetService("HttpService"):JSONEncode(SettingsGameData))
+end
+
 if not game:IsLoaded() then
     game.Loaded:Wait()
 end
@@ -1420,7 +1496,7 @@ RunService.RenderStepped:Connect(function()
     end
 end)
 
-local Fluent = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua"))()
+local Fluent = loadstring(game:HttpGet("https://raw.githubusercontent.com/ReisagaTest/TestNgu/refs/heads/main/abcui.lua"))()
 Window = Fluent:CreateWindow({
     Title = "Banana Cat Hub [ Freemium ]",
     SubTitle = "| By Shinichi",
@@ -2201,6 +2277,7 @@ Slider = LGa:AddSlider("Slider", {
 Toggle = LGa:AddToggle("Toggle", { Title = "Auto Stats", Default = false })
 Toggle:OnChanged(function(Value)
     getgenv().AutoStats = Value
+    Save()
 end)
 local canChangeTeam = true
 local debounceTime = 2
@@ -2375,6 +2452,7 @@ if World1 then
     Dropdown:SetValue("0.15")
     Dropdown:OnChanged(function(Value)
         getgenv().SelectIsland = Value
+        Save()
     end)
 end
 if World2 then
@@ -2392,6 +2470,7 @@ if World2 then
     Dropdown:SetValue("0.15")
     Dropdown:OnChanged(function(Value)
         getgenv().SelectIsland = Value
+        Save()
     end)
 end
 if World3 then
@@ -2408,11 +2487,13 @@ if World3 then
     Dropdown:SetValue("0.15")
     Dropdown:OnChanged(function(Value)
         getgenv().SelectIsland = Value
+        Save()
     end)
 end    
 Toggle = LGa:AddToggle("Toggle", {Title = "Teleport Island", Default = false })
 Toggle:OnChanged(function(Value)
     getgenv().TeleportIsland = Value
+    Save()
     if getgenv().TeleportIsland == true then
         repeat task.wait()
             if getgenv().SelectIsland == "WindMill" then
@@ -2524,6 +2605,7 @@ Dropdown = Settings:AddDropdown("DropdownFarm", {
 Dropdown:SetValue("Melee")
 Dropdown:OnChanged(function(value)
     getgenv().SelectWeapon = value
+    Save()
 end)
 task.spawn(function()
     local lastWeapon = nil
@@ -2549,6 +2631,7 @@ end)
 Toggle = Settings:AddToggle("Toggle", {Title = "Auto Turn On Buso", Default = true })
 Toggle:OnChanged(function(Value)
     getgenv().AUTOHAKI = Value
+    Save()
 end)
 spawn(function()
     local canUseHaki = true
@@ -2572,6 +2655,7 @@ end)
 Toggle = Settings:AddToggle("Toggle", { Title = "Auto Turn On Race V4", Default = false })
 Toggle:OnChanged(function(Value)
     getgenv().AutoTurnOnV4 = Value
+    Save()
 end)
 task.spawn(function()
     local lastCheckTime = 0
@@ -2597,6 +2681,7 @@ end)
 Toggle = Settings:AddToggle("Toggle", {Title = "Auto Turn On Race V3", Default = false })
 Toggle:OnChanged(function(Value)
     getgenv().AutoTurnOnV3 = Value
+    Save()
 end)
 task.spawn(function()
     local prevState = false    
@@ -2616,6 +2701,7 @@ local Toggle = Settings:AddToggle("Toggle", {Title = "Auto Set Spawn Point", Def
 local lastSetState = false
 Toggle:OnChanged(function(Value)
     getgenv().Set = Value
+    Save()
     if Value ~= lastSetState then
         lastSetState = Value
         if Value then
@@ -2628,6 +2714,7 @@ end)
 Toggle = Settings:AddToggle("Toggle", {Title = "Anti AFK", Default = true })
 Toggle:OnChanged(function(Value)
     getgenv().AntiAFK = Value 
+    Save()
 end)
 local function AntiAfk()
     task.spawn(function()
@@ -2651,6 +2738,7 @@ end
 Toggle = Settings:AddToggle("Toggle", {Title = "Auto Dodge All Skill", Description = "Dodge When Have Skills", Default = false })
 Toggle:OnChanged(function(Value)
     getgenv().AutoDodge = Value
+    Save()
 end)
 Slider = Settings:AddSlider("Slider", {
      Title = "Spin Dodge Speed",
@@ -2660,15 +2748,21 @@ Slider = Settings:AddSlider("Slider", {
      Rounding = 5,
      Callback = function(Value)
          getgenv().SpinSpeed = Value
+            Save()
     end
 })
 Toggle = Settings:AddToggle("Toggle", {Title = "Reset Teleport", Default = false })
 Toggle:OnChanged(function(Value)
     BypassTP = Value 
+    Save()
 end)
 Toggle = Settings:AddToggle("Bypass TP", { Title = "Stop Reset Teleport When Have Legendary", Default = false })
 Toggle:OnChanged(function(Value)
     getgenv().StopTP = Value
+    Save()
+    if Value then
+        BypassTP = false
+    end
 end)
 spawn(function()
 	while task.wait(1) do
@@ -2692,6 +2786,7 @@ local function FastAttackLoop()
 end
 Toggle:OnChanged(function(Value)
     getgenv().FastAttack = Value
+    Save()
     if Value and not FastAttackTask then
         FastAttackTask = task.spawn(FastAttackLoop)
     end
@@ -2702,6 +2797,7 @@ end)
 Toggle = Settings:AddToggle("Toggle", {Title = "Bring Mob", Default = true})
 Toggle:OnChanged(function(Value)
     getgenv().BringMonster = Value
+    Save()
 end)
 local RunService = game:GetService("RunService")
 local Players = game:GetService("Players")
@@ -2764,6 +2860,7 @@ end)
 Toggle = Settings:AddToggle("Toggle", {Title = "Spin Position", Description = "Spin Position When Farm", Default = true })
 Toggle:OnChanged(function(Value)
     getgenv().SpinPos = Value
+    Save()
 end)
 spawn(function()
     while wait() do
@@ -2788,11 +2885,13 @@ Slider = Settings:AddSlider("Slider", {
      Rounding = 5,
      Callback = function(Value)
          PosY = Value
+            Save()
     end
 })
 Toggle = Settings:AddToggle("Toggle", {Title = "Auto Reduce Lag Farm Safely", Default = true })
 Toggle:OnChanged(function(Value)
     getgenv().ReduceLag = Value
+    Save()
 end)
 spawn(function()
     while wait(0.1) do
@@ -2810,6 +2909,20 @@ end)
 Toggle = Settings:AddToggle("Toggle", {Title = "Anti Cheat Farming", Description = "This feature helps you Farm safely without being detected", Default = true })
 Toggle:OnChanged(function(Value)
     getgenv().ResetFlags = Value
+    Save()
+    if getgenv().ResetFlags then
+        local player = game:GetService("Players").LocalPlayer
+        for _, v in pairs(player.Character:GetDescendants()) do
+            if v:IsA("LocalScript") then
+                v:Destroy()
+            end
+        end
+        for _, v in pairs(player.PlayerScripts:GetDescendants()) do
+            if v:IsA("LocalScript") then
+                v:Destroy()
+            end
+        end
+    end
 end)
 spawn(function()
     while task.wait(5) do
@@ -2849,12 +2962,13 @@ Main:AddParagraph({
 })
 Dropdown = Main:AddDropdown("DropdownFarm", {
     Title = "Select Method Farm",
-    Values = {"Farm Level", "Farm Bone", "Farm Katakuri"},
+    Values = {"Farm Level", "Farm Bone", "Farm Katakuri", "Tyrant Of The Skies"},
     Multi = false,
 })
 Dropdown:SetValue("Farm Level")
 Dropdown:OnChanged(function(Value)
 FarmMode = Value
+Save()
 end)
 spawn(function()
     local canRun = true
@@ -2881,7 +2995,7 @@ spawn(function()
                                             EquipWeapon(getgenv().SelectWeapon)
                                             AutoHaki()
                                             PosMon = v.HumanoidRootPart.CFrame
-                                            TweenPlayer(v.HumanoidRootPart.CFrame * Pos)
+                                            topos(v.HumanoidRootPart.CFrame * Pos)
                                             v.Humanoid.WalkSpeed = 0
                                             v.HumanoidRootPart.Size = Vector3.new(1, 1, 1)
                                             MonFarm = v.Name
@@ -2892,7 +3006,7 @@ spawn(function()
                             end
                         end
                     else
-                        TweenPlayer(CFrameMon)
+                        topos(CFrameMon)
                         UnEquipWeapon(getgenv().SelectWeapon)
                     end
                 end
@@ -3083,10 +3197,95 @@ spawn(function()
         end
     end
 end)
+
+local function useAllSkill(v405)
+    game:GetService("VirtualInputManager"):SendKeyEvent(true, v405, false, game)
+    game:GetService("VirtualInputManager"):SendKeyEvent(false, v405, false, game)
+end
+
+spawn(function()
+    while task.wait(0.1) do
+            if not getgenv().AutoFarm and FarmMode == "Tyrant Of The Skies" then return end
+            pcall(function()
+                local islandModel = game:GetService("Workspace").Map.TikiOutpost.IslandModel
+                local enemies = game:GetService("Workspace").Enemies
+                local targetEyes = { Eye1 = false, Eye2 = false, Eye3 = false, Eye4 = false }
+                local targetEnemies = { "Serpent Hunter", "Skull Slayer", "Isle Champion", "Sun-kissed Warrior" }
+                local tyrantFound = enemies:FindFirstChild("Tyrant of the Skies")
+
+                if not tyrantFound then
+                    for _, v in ipairs(islandModel:GetChildren()) do
+                        if v.Name:match("^Eye%d$") and targetEyes[v.Name] ~= nil and v.Transparency == 0 then
+                            targetEyes[v.Name] = true
+                        end
+                    end
+                    local allEyesFound = true
+                    for _, found in pairs(targetEyes) do
+                        if not found then
+                            allEyesFound = false
+                            break
+                        end
+                    end
+
+                    if not allEyesFound then
+                        for _, v in ipairs(enemies:GetChildren()) do
+                            if table.find(targetEnemies, v.Name) and v.Humanoid and v.Humanoid.Health > 0 then
+                                repeat
+                                    task.wait()
+                                    EquipWeapon(getgenv().SelectWeapon)
+                                    toposr(v.HumanoidRootPart.CFrame * Pos)
+                                    AutoHaki()
+                                    v.Humanoid.JumpPower = 0
+                                    v.Humanoid.WalkSpeed = 0
+                                    PosMon = v.HumanoidRootPart.CFrame
+                                    MonFarm = v.Name
+                                until not v.Parent or v.Humanoid.Health <= 0 or allEyesFound or not _G.FullyTyrant
+                            end
+                        end
+                    else
+                        for _, model in ipairs(islandModel:GetChildren()) do
+                            local arena = model:FindFirstChild("EagleBossArena")
+                            if arena then
+                                for _, v in ipairs(arena:GetChildren()) do
+                                    if v.Name == "Tree" then
+                                        topos(v.WorldPivot.Position)
+                                        useAllSkill()
+                                    end
+                                end
+                            end
+                        end
+                    end
+                else
+                    for _, v in ipairs(enemies:GetChildren()) do
+                        if v.Name == "Tyrant of the Skies" and v.Humanoid and v.HumanoidRootPart and v.Humanoid.Health > 0 then
+                            repeat
+                                task.wait()
+                                AutoHaki()
+                                EquipWeapon(getgenv().SelectWeapon)
+                                v.HumanoidRootPart.CanCollide = false
+                                v.Humanoid.WalkSpeed = 0
+                                v.HumanoidRootPart.Size = Vector3.new(50, 50, 50)
+                                local targetCFrame = v.HumanoidRootPart.CFrame * CFrame.new(0, 40, 0)
+                                
+                                if (game.Players.LocalPlayer.Character.HumanoidRootPart.Position - targetCFrame.Position).Magnitude > 1500 then
+                                    BTP(targetCFrame)
+                                else
+                                    topos(targetCFrame)
+                                end
+                                UnEquipWeapon(getgenv().SelectWeapon)
+                                topos(CFrame.new(-16194.005, 155.218, 1420.72))
+                            until not v.Parent or v.Humanoid.Health <= 0
+                        end
+                    end
+                end
+            end)
+        end
+    end)
 Toggle = Main:AddToggle("Toggle", { Title = "Start Farm", Default = false })
 Toggle:OnChanged(function(Value)
     getgenv().AutoFarm = Value
     StopTween(getgenv().AutoFarm)
+    Save()
 end)
 Main:AddParagraph({
      Title = "Farming Material",
@@ -3107,11 +3306,13 @@ MaterialListMon = Main:AddDropdown("MaterialListMon", {
 })
 MaterialListMon:OnChanged(function(Value)
     getgenv().SelectMaterial = Value
+    Save()
 end)
 Toggle = Main:AddToggle("Toggle", {Title = "Farm Material", Default = false})
 Toggle:OnChanged(function(Value)
     getgenv().AutoMaterial = Value
     if not Value then StopTween() end
+    Save()
 end)
 spawn(function()
     local function processEnemy(v, EnemyName)
@@ -6500,6 +6701,7 @@ spawn(function()
                             if getgenv().UseMelee then equipAndUseWeapon("Melee") end
                             if getgenv().UseSword then equipAndUseWeapon("Sword") end
                             if getgenv().UseGun then equipAndUseWeapon("Gun") end
+                            if getgenv().UseFruit then equipAndUseWeapon("Blox Fruit") end
                         end
                     end
                     getgenv().TweenToPrehistoric = false
@@ -6622,7 +6824,7 @@ Race:AddParagraph({
     Content = "-----"
 })
 local RunService = game:GetService("RunService")
-Toggle = Race:AddToggle("Toggle", {Title = "Teleport To The Draco Clan Trial Door", Default = false})
+Toggle = Race:AddToggle("Toggle", {Title = "Teleport To The Draco Trial Door", Default = false})
 Toggle:OnChanged(function(Value)
     getgenv().TrialTeleportDraco = Value
 end)
@@ -6642,6 +6844,26 @@ spawn(function()
         end
     end
 end)
+Race:AddButton({
+    Title = "Change To Draco Race",
+    Callback = function()
+    game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("requestEntrance", Vector3.new(5661.5322265625, 1013.0907592773438, - 334.9649963378906));
+        Tween2(CFrame.new(5814.42724609375, 1208.3267822265625, 884.5785522460938));
+        local v368 = Vector3.new(5814.42724609375, 1208.3267822265625, 884.5785522460938);
+        local v369 = game.Players.LocalPlayer;
+        local v370 = v369.Character or v369.CharacterAdded:Wait() ;
+        repeat
+            wait();
+        until (v370.HumanoidRootPart.Position - v368).Magnitude < 1
+        local v371 = {
+            [1] = {
+                NPC = "Dragon Wizard",
+                Command = "DragonRace"
+            }
+        };
+        game:GetService("ReplicatedStorage").Modules.Net:FindFirstChild("RF/InteractDragonQuest"):InvokeServer(unpack(v371));
+    end
+})
 Race:AddParagraph({
     Title = "Race Normal",
     Content = "-----"
@@ -7082,6 +7304,149 @@ spawn(function()
         end
     end
 end)
+Toggle = Race:AddToggle("Toggle", { Title = "Auto Pull Lever(Not Work Ez Kid)", Default = false })
+Toggle:OnChanged(function(Value)
+    getgenv().AutoPullLever = Value
+end)
+
+local function getGameTime()
+    local clockTime = game.Lighting.ClockTime
+    if clockTime >= 18 or clockTime < 5 then
+        return "Night"
+    end
+    return "Day"
+end
+
+local function getBlueGear()
+    if game.workspace.Map:FindFirstChild("MysticIsland") then
+        for _, v in pairs(game.workspace.Map.MysticIsland:GetChildren()) do
+            if v:IsA("MeshPart") and v.MeshId == "rbxassetid://10153114969" then
+                return v
+            end
+        end
+    end
+end
+
+local function getHighestPoint()
+    if game.workspace.Map:FindFirstChild("MysticIsland") then
+        for _, v in pairs(game.workspace.Map.MysticIsland:GetDescendants()) do
+            if v:IsA("MeshPart") and v.MeshId == "rbxassetid://6745037796" then
+                return v
+            end
+        end
+    end
+end
+
+local function checkNeonPart()
+    if game:GetService("Workspace").Map:FindFirstChild("MysticIsland") then
+        for _, v in pairs(game:GetService("Workspace").Map.MysticIsland:GetDescendants()) do
+            if v.Name == "Part" and v.Material == Enum.Material.Neon and v.Transparency == 0 then
+                return true, v
+            end
+        end
+    end
+    return false, nil
+end
+
+local function autoPullLever()
+    task.spawn(function()
+        local doorsau = CFrame.new(28576.4688, 14935.9512, 75.469101, -1, -4.22219593e-08, 1.13133396e-08, 0, -0.258819044, -0.965925813, 4.37113883e-08, -0.965925813, 0.258819044)
+        local doorThreshold = 0.2
+
+        while task.wait(0.1) do
+            pcall(function()
+                if not getgenv().AutoPullLever then return end
+
+                local templeDoorOpen = game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("CheckTempleDoor")
+                local mysticIsland = game:GetService("Workspace").Map:FindFirstChild("MysticIsland")
+                local isNight = getGameTime() == "Night"
+                local neonPartFound, neonPart = checkNeonPart()
+
+                if templeDoorOpen then
+                    local lever = game:GetService("Workspace").Map["Temple of Time"].Lever
+                    if math.abs(lever.Lever.CFrame.Z - doorsau.Z) > doorThreshold then
+                        if (game.Players.LocalPlayer.Character.HumanoidRootPart.Position - lever.Part.Position).Magnitude > 10 then
+                            toTarget(game.Players.LocalPlayer.Character.HumanoidRootPart.Position, lever.Part.Position, lever.Part.CFrame)
+                        else
+                            fireproximityprompt(lever.Prompt.ProximityPrompt, 1)
+                        end
+                    else
+                        Event:Fire("Notify", {
+                            Name = "Shinichi Hub",
+                            Title = "Notification",
+                            Body = "Pull Lever Complete",
+                            Sound = "Ping",
+                            Color = Color3.fromRGB(89, 121, 81)
+                        })
+                        getgenv().AutoPullLever = false
+                    end
+                elseif mysticIsland then
+                    if isNight then
+                        if neonPartFound then
+                            toTarget(neonPart.CFrame)
+                        else
+                            local totar = toTarget(game:GetService("Workspace").Map.MysticIsland:GetModelCFrame() * CFrame.new(1, 100, 0))
+                            totar:Wait()
+                            game:GetService("ReplicatedStorage").Remotes.CommE:FireServer("ActivateAbility")
+                            local moonPos = game:GetService("Lighting"):GetMoonDirection() * 50 * 10000
+                            game.workspace.CurrentCamera.CoordinateFrame = CFrame.new(game.workspace.CurrentCamera.CoordinateFrame.p, moonPos)
+                        end
+
+                        local raceProgress = game.ReplicatedStorage.Remotes.CommF_:InvokeServer("RaceV4Progress", "Check")
+                        if raceProgress == 1 then
+                            game.ReplicatedStorage.Remotes.CommF_:InvokeServer("RaceV4Progress", "Begin")
+                        elseif raceProgress == 2 then
+                            local targetPos = CFrame.new(2956.78, 2281.85, -7217.63)
+                            toTarget(game.Players.LocalPlayer.Character.HumanoidRootPart.Position, targetPos.Position, targetPos)
+                            if (targetPos.Position - game.Players.LocalPlayer.Character.HumanoidRootPart.Position).Magnitude < 8 then
+                                game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("RaceV4Progress", "Teleport")
+                            end
+                        elseif raceProgress == 3 then
+                            game.ReplicatedStorage.Remotes.CommF_:InvokeServer("RaceV4Progress", "Continue")
+                        else
+                            local blueGear = getBlueGear()
+                            if blueGear and not blueGear.CanCollide and blueGear.Transparency ~= 1 then
+                                toTarget(game.Players.LocalPlayer.Character.HumanoidRootPart.Position, blueGear.Position, blueGear.CFrame)
+                            elseif blueGear and blueGear.Transparency == 1 then
+                                local highestPoint = getHighestPoint()
+                                if highestPoint and (highestPoint.CFrame * CFrame.new(0, 211.88, 0).Position - game.Players.LocalPlayer.Character.HumanoidRootPart.Position).Magnitude > 10 then
+                                    toTarget(game.Players.LocalPlayer.Character.HumanoidRootPart.Position, highestPoint.Position, highestPoint.CFrame * CFrame.new(0, 211.88, 0))
+                                else
+                                    game.workspace.CurrentCamera.CFrame = CFrame.new(game.workspace.CurrentCamera.CFrame.Position, game:GetService("Lighting"):GetMoonDirection() + game.workspace.CurrentCamera.CFrame.Position)
+                                    task.wait(0.1)
+                                    game:service("VirtualInputManager"):SendKeyEvent(true, "T", false, game)
+                                    task.wait()
+                                    game:service("VirtualInputManager"):SendKeyEvent(false, "T", false, game)
+                                    task.wait(1.5)
+                                end
+                            end
+                        end
+                    else
+                        Event:Fire("Notify", {
+                            Name = "Shinichi Hub",
+                            Title = "Notification",
+                            Body = "Night is required to pull the lever, Please wait until night",
+                            Sound = "Ping",
+                            Color = Color3.fromRGB(89, 121, 81)
+                        })
+                        task.wait(5)
+                    end
+                elseif getgenv().PullLeverHop then
+                    HopServer()
+                else
+                    Event:Fire("Notify", {
+                        Name = "Shinichi Hub",
+                        Title = "Notification",
+                        Body = "Not found, please check or wait until night or mirage is active",
+                        Sound = "Ping",
+                        Color = Color3.fromRGB(89, 121, 81)
+                    })
+                    task.wait(2)
+                end
+            end)
+        end
+    end)
+end
 Race:AddButton({
     Title = "Teleport To Trial Door",
     Callback = function()
